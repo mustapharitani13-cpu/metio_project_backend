@@ -70,12 +70,32 @@ app.add_middleware(
 # ----------------------------
 @app.get("/health")
 async def health_check():
+    import ssl
+    import platform
+    import socket
+    info = {
+        "python": platform.python_version(),
+        "openssl": ssl.OPENSSL_VERSION,
+        "mongo_url_set": bool(os.getenv("MONGO_URL")),
+    }
+    # Raw SSL test to MongoDB Atlas
+    try:
+        ctx = ssl.create_default_context()
+        with socket.create_connection(("ac-3fviasq-shard-00-00.r0fyxzf.mongodb.net", 27017), timeout=10) as sock:
+            with ctx.wrap_socket(sock, server_hostname="ac-3fviasq-shard-00-00.r0fyxzf.mongodb.net") as ssock:
+                info["raw_ssl"] = f"OK - {ssock.version()}"
+    except Exception as e:
+        info["raw_ssl"] = str(e)[:200]
+    # Motor connection test
     from database import client
     try:
         result = await client.admin.command("ping")
-        return {"status": "ok", "db": "connected", "mongo_url_set": bool(os.getenv("MONGO_URL"))}
+        info["status"] = "ok"
+        info["db"] = "connected"
     except Exception as e:
-        return {"status": "error", "db": str(e), "mongo_url_set": bool(os.getenv("MONGO_URL"))}
+        info["status"] = "error"
+        info["db"] = str(e)[:200]
+    return info
 
 # ----------------------------
 # Schemas
