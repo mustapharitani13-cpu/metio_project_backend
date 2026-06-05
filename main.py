@@ -66,6 +66,18 @@ app.add_middleware(
 )
 
 # ----------------------------
+# Health check (debug)
+# ----------------------------
+@app.get("/health")
+async def health_check():
+    from database import client
+    try:
+        result = await client.admin.command("ping")
+        return {"status": "ok", "db": "connected", "mongo_url_set": bool(os.getenv("MONGO_URL"))}
+    except Exception as e:
+        return {"status": "error", "db": str(e), "mongo_url_set": bool(os.getenv("MONGO_URL"))}
+
+# ----------------------------
 # Schemas
 # ----------------------------
 class ChatRequest(BaseModel):
