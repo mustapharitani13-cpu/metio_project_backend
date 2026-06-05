@@ -6,3 +6,4 @@ aiohttp
 bcrypt
 python-dotenv
 motor
+dnspython
