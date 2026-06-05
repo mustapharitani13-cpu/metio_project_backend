@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+requests
+aiohttp
+bcrypt
+python-dotenv
+motor
