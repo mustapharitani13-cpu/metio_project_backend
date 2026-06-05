@@ -57,18 +57,9 @@ GROK_API_KEY = os.getenv("GROQ_API_KEY", "YOUR_GROQ_KEY")
 # ----------------------------
 app = FastAPI()
 
-origins = [
-    "http://localhost:5173",    # Default Vite port
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",    # Default Create-React-App port
-    # Add your deployed frontend URL here when you have it!
-    # "https://your-frontend-app.vercel.app" 
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
